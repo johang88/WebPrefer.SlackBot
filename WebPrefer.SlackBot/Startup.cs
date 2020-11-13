@@ -42,13 +42,14 @@ namespace WebPrefer.SlackBot
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();
             app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
             app.UseSlackNet(c => c
                 .UseSigningSecret(Configuration["Slack:SigningSecret"])
                 .MapToPrefix("slack")
             );
+
+            app.UseRouting();
 
             var collection = new FontCollection();
             var fontFamily = collection.Install(env.GetFontPath("OpenSans-Bold.ttf"));

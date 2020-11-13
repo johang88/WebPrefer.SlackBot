@@ -21,8 +21,9 @@ namespace WebPrefer.SlackBot.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            _logger.LogInformation($"{context.Request.Method} {context.Request.Path} {context.Request.QueryString}");
+            _logger.LogInformation($"Request {context.Request.Method} {context.Request.Path}{context.Request.QueryString}");
             await _next(context);
+            _logger.LogInformation($"Response {context.Request.Method} {context.Request.Path}{context.Request.QueryString}: {context.Response.StatusCode}");
         }
     }
 }
