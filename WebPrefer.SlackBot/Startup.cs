@@ -42,25 +42,16 @@ namespace WebPrefer.SlackBot
             app.UseRouting();
 
             var collection = new FontCollection();
-            var fontFamily = collection.Install(Path.Combine(env.WebRootPath, "fonts/OpenSans-Bold.ttf"));
+            var fontFamily = collection.Install(env.GetFontPath("OpenSans-Bold.ttf"));
             var font = fontFamily.CreateFont(50.0f, FontStyle.Bold);
 
-            var images = new string[] { "ironic" };
+            var images = Directory.GetFiles(env.GetMemesPath(), "*.jpg").Select(Path.GetFileName).ToArray();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/meme/{image}", async context =>
                 {
-                    if (!context.Request.Query.ContainsKey("text"))
-                    {
-                        context.Response.StatusCode = 400;
-                        await context.Response.WriteAsync("missing text");
-                        return;
-                    }
-
-                    var text = context.Request.Query["text"];
-
-                    var imageName = (string)context.Request.RouteValues["image"];
+                    var imageName = (string)context.Request.RouteValues["image"] + ".jpg";
                     if (!images.Contains(imageName))
                     {
                         context.Response.StatusCode = 400;
@@ -68,19 +59,36 @@ namespace WebPrefer.SlackBot
                         return;
                     }
 
-                    var imagePath = Path.Combine(env.WebRootPath, imageName + ".jpg");
+                    var imagePath = env.GetMemePath(imageName);
                     using var stream = File.OpenRead(imagePath);
                     using var image = await Image.LoadAsync(stream);
 
-                    var rect = TextMeasurer.Measure(text, new RendererOptions(font));
-                    var position = new PointF(image.Width / 2.0f - rect.Width / 2.0f, image.Height - 5 - rect.Height);
+                    var topText = context.Request.Query["top"];
+                    var bottomText = context.Request.Query["bottom"];
 
-                    image.Mutate(x => x.DrawText(text, font, Color.White, position));
+                    if (!string.IsNullOrWhiteSpace(topText))
+                        DrawText(topText, false);
+
+                    if (!string.IsNullOrWhiteSpace(bottomText))
+                        DrawText(bottomText, true);
 
                     context.Response.ContentType = "image/jpg";
                     await image.SaveAsync(context.Response.Body, new JpegEncoder());
 
                     image.SaveAsJpeg(context.Response.Body);
+
+                    void DrawText(string text, bool bottom)
+                    {
+                        var margin = 5.0f;
+
+                        var rect = TextMeasurer.Measure(text, new RendererOptions(font));
+                        
+                        var position = new PointF(
+                            image.Width / 2.0f - rect.Width / 2.0f,
+                            bottom ? image.Height - margin - rect.Height : margin);
+
+                        image.Mutate(x => x.DrawText(text, font, Color.White, position));
+                    }
                 });
             });
         }
