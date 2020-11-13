@@ -10,6 +10,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      PUSH_PACKAGES: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
     steps:
     - uses: actions/checkout@v2
@@ -24,8 +26,10 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
+      if: ${{ env.PUSH_PACKAGES }}
       run: dotnet publish
     - name: Upload artifacts
+      if: ${{ env.PUSH_PACKAGES }}
       uses: actions/upload-artifact@v2
       with:
         name: WebPrefer.SlackBot
