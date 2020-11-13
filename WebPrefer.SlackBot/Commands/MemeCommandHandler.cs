@@ -37,15 +37,15 @@ namespace WebPrefer.SlackBot.Commands
 
             var meme = commands[0];
             var top = commands.Count >= 2 ? commands[1] : "";
-            var bottom = commands.Count >= 23? commands[2] : "";
+            var bottom = commands.Count >= 23 ? commands[2] : "";
 
             return new SlashCommandResponse
             {
                 ResponseType = ResponseType.InChannel,
 
                 Message = new Message
-                {   
-                    Attachments = new   List<Attachment>()
+                {
+                    Attachments = new List<Attachment>()
                     {
                         new Attachment
                         {
