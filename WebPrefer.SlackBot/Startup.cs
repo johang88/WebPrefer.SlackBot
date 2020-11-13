@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using WebPrefer.SlackBot.Commands;
 
 namespace WebPrefer.SlackBot
 {
@@ -27,7 +28,10 @@ namespace WebPrefer.SlackBot
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSlackNet(c => c.UseApiToken(Configuration["Slack:ApiToken"]));
+            services.AddSlackNet(c => c
+                .UseApiToken(Configuration["Slack:ApiToken"])
+                .RegisterSlashCommandHandler<MemeCommandHandler>("/meme")
+            ); 
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -37,7 +41,10 @@ namespace WebPrefer.SlackBot
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSlackNet(c => c.UseSigningSecret(Configuration["Slack:SigningSecret"]));
+            app.UseSlackNet(c => c
+                .UseSigningSecret(Configuration["Slack:SigningSecret"])
+                .MapToPrefix("slack")
+            );
 
             app.UseRouting();
 
