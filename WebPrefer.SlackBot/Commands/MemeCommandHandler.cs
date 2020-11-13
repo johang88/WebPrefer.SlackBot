@@ -51,7 +51,7 @@ namespace WebPrefer.SlackBot.Commands
                     {
                         new Attachment
                         {
-                            ImageUrl = $"https://webpreferslackbot.azurewebsites.net/meme/{meme}?top={top}&bottom={bottom}"
+                            ImageUrl = $"https://webpreferslackbot.azurewebsites.net/meme/{meme}?top={Uri.EscapeUriString(top)}&bottom={Uri.EscapeUriString(bottom)}"
                         }
                     },
                 }
