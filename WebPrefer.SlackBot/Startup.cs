@@ -22,9 +22,9 @@ namespace WebPrefer.SlackBot
     {
         public IConfiguration Configuration { get; }
 
-        public Startup(IConfiguration configuration) 
+        public Startup(IConfiguration configuration)
             => Configuration = configuration;
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSlackNet(c => c.UseApiToken(Configuration["Slack:ApiToken"]));
@@ -84,13 +84,26 @@ namespace WebPrefer.SlackBot
                     {
                         var margin = 5.0f;
 
-                        var rect = TextMeasurer.Measure(text, new RendererOptions(font));
-                        
+                        var dpi = 72.0f;
+                        var rect = TextMeasurer.Measure(text, new RendererOptions(font, dpi)
+                        {
+                            WrappingWidth = image.Width,
+                        });
+
                         var position = new PointF(
-                            image.Width / 2.0f - rect.Width / 2.0f,
+                            0.0f,
                             bottom ? image.Height - margin - rect.Height : margin);
 
-                        image.Mutate(x => x.DrawText(text, font, Brushes.Solid(Color.White), Pens.Solid(Color.Black, 2.0f), position));
+                        image.Mutate(x => x.DrawText(new TextGraphicsOptions
+                        {
+                            TextOptions = new TextOptions
+                            {
+                                DpiX = dpi,
+                                DpiY = dpi,
+                                WrapTextWidth = image.Width,
+                                HorizontalAlignment = HorizontalAlignment.Center
+                            }
+                        }, text, font, Brushes.Solid(Color.White), Pens.Solid(Color.Black, 2.0f), position));
                     }
                 });
             });
