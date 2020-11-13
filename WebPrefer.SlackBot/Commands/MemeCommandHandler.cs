@@ -45,6 +45,7 @@ namespace WebPrefer.SlackBot.Commands
 
                 Message = new Message
                 {
+                    AsUser = true,
                     Attachments = new List<Attachment>()
                     {
                         new Attachment
