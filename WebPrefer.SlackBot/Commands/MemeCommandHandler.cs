@@ -37,7 +37,7 @@ namespace WebPrefer.SlackBot.Commands
 
             var meme = commands[0];
             var top = commands.Count >= 2 ? commands[1] : "";
-            var bottom = commands.Count >= 23 ? commands[2] : "";
+            var bottom = commands.Count >= 3 ? commands[2] : "";
 
             return new SlashCommandResponse
             {
@@ -76,12 +76,9 @@ namespace WebPrefer.SlackBot.Commands
                             index = i + 1;
                             break;
                         case '"' when inQuote:
-                            AddResult(text[index..i]);
-                            index = i + 1;
                             inQuote = false;
                             break;
                         case '"' when !inQuote:
-                            index = i + 1;
                             inQuote = true;
                             break;
                     }
@@ -92,11 +89,7 @@ namespace WebPrefer.SlackBot.Commands
                 return result;
 
                 void AddResult(string res)
-                {
-                    res = res.Trim();
-                    if (res.Length > 0)
-                        result.Add(res);
-                }
+                    => result.Add(res.Trim('"'));
             }
         }
     }
