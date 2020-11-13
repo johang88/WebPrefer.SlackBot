@@ -69,11 +69,8 @@ namespace WebPrefer.SlackBot
                     if (context.Request.Query.ContainsKey("text"))
                         bottomText = context.Request.Query["text"];
 
-                    if (!string.IsNullOrWhiteSpace(topText))
-                        DrawText(topText, false);
-
-                    if (!string.IsNullOrWhiteSpace(bottomText))
-                        DrawText(bottomText, true);
+                    DrawText(topText, false);
+                    DrawText(bottomText, true);
 
                     context.Response.ContentType = "image/jpg";
                     await image.SaveAsync(context.Response.Body, new JpegEncoder());
@@ -82,6 +79,9 @@ namespace WebPrefer.SlackBot
 
                     void DrawText(string text, bool bottom)
                     {
+                        if (string.IsNullOrWhiteSpace(text))
+                            return;
+
                         var margin = 5.0f;
 
                         var dpi = 72.0f;
