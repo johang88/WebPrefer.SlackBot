@@ -22,6 +22,7 @@ namespace WebPrefer.SlackBot
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(logging =>
                 {
+                    logging.AddConsole();
                     logging.AddAzureWebAppDiagnostics();
                 })
                 .ConfigureServices(serviceCollection =>
