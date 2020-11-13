@@ -82,8 +82,6 @@ namespace WebPrefer.SlackBot
                     context.Response.ContentType = "image/jpg";
                     await image.SaveAsync(context.Response.Body, new JpegEncoder());
 
-                    image.SaveAsJpeg(context.Response.Body);
-
                     void DrawText(string text, bool bottom)
                     {
                         if (string.IsNullOrWhiteSpace(text))
