@@ -87,7 +87,7 @@ namespace WebPrefer.SlackBot
                             image.Width / 2.0f - rect.Width / 2.0f,
                             bottom ? image.Height - margin - rect.Height : margin);
 
-                        image.Mutate(x => x.DrawText(text, font, Color.White, position));
+                        image.Mutate(x => x.DrawText(text, font, Brushes.Solid(Color.White), Pens.Solid(Color.Black, 2.0f), position));
                     }
                 });
             });
