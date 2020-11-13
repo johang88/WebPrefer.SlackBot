@@ -40,8 +40,10 @@ namespace WebPrefer.SlackBot.Commands
 
             return new SlashCommandResponse
             {
+                ResponseType = ResponseType.InChannel,
+
                 Message = new Message
-                {
+                {   
                     Text = $"https://webpreferslackbot.azurewebsites.net/meme/{meme}?top={top}&bottom={bottom}"
                 }
             };
