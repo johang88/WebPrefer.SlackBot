@@ -66,6 +66,9 @@ namespace WebPrefer.SlackBot
                     var topText = context.Request.Query["top"];
                     var bottomText = context.Request.Query["bottom"];
 
+                    if (context.Request.Query.ContainsKey("text"))
+                        bottomText = context.Request.Query["text"];
+
                     if (!string.IsNullOrWhiteSpace(topText))
                         DrawText(topText, false);
 
