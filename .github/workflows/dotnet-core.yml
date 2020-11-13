@@ -11,7 +11,8 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      PUSH_PACKAGES: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      DEPLOY: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      AZURE_WEBAPP_NAME: WebPreferSlackBot
 
     steps:
     - uses: actions/checkout@v2
@@ -26,11 +27,14 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish
-      if: ${{ env.PUSH_PACKAGES }}
-      run: dotnet publish
-    - name: Upload artifacts
-      if: ${{ env.PUSH_PACKAGES }}
-      uses: actions/upload-artifact@v2
+      if: ${{ env.DEPLOY }}
+      run: |
+        dotnet publish -c Release -o webpreferslackbot 
+    - name: Deploy
+      if: ${{ env.DEPLOY }}
+      uses: azure/webapps-deploy@v2
       with:
-        name: WebPrefer.SlackBot
-        path: /home/runner/work/WebPrefer.SlackBot/WebPrefer.SlackBot/WebPrefer.SlackBot/bin/Debug/net5.0/publish/
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: './webpreferslackbot'
+    
