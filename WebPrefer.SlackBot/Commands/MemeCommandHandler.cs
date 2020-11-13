@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SlackNet;
 using SlackNet.Interaction;
 using SlackNet.WebApi;
 using System;
@@ -44,7 +45,13 @@ namespace WebPrefer.SlackBot.Commands
 
                 Message = new Message
                 {   
-                    Text = $"https://webpreferslackbot.azurewebsites.net/meme/{meme}?top={top}&bottom={bottom}"
+                    Attachments = new   List<Attachment>()
+                    {
+                        new Attachment
+                        {
+                            ImageUrl = $"https://webpreferslackbot.azurewebsites.net/meme/{meme}?top={top}&bottom={bottom}"
+                        }
+                    },
                 }
             };
 
