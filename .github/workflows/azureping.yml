@@ -10,7 +10,7 @@ jobs:
   request:
     runs-on: ubuntu-latest
     steps:
-      - name: Request Postment Echo GET
+      - name: Just ping it
         uses: fjogeleit/http-request-action@master
         with:
           url: 'https://webpreferslackbot.azurewebsites.net/meme/happylemon?top=test'
