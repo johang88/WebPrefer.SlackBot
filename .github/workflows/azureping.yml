@@ -1,0 +1,17 @@
+name: Azure ping
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the main branch
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+
+jobs:
+  request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request Postment Echo GET
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: 'https://webpreferslackbot.azurewebsites.net/meme/happylemon?top=test'
+          method: 'GET'
