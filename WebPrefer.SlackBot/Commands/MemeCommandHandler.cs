@@ -21,7 +21,7 @@ namespace WebPrefer.SlackBot.Commands
         {
             _logger.LogInformation($"Processing command: {command.Command} {command.Text} from: {command.UserName}");
 
-            var commands = ParseCommand(command.Text);
+            var commands = CommandParser.Parse(command.Text);
 
             if (!commands.Any())
             {
@@ -56,41 +56,6 @@ namespace WebPrefer.SlackBot.Commands
                     },
                 }
             };
-
-            static List<string> ParseCommand(string text)
-            {
-                var result = new List<string>();
-
-                // TODO: Make parsing not crappy
-                // should probably make a more generic command tokenizer + parser
-                var inQuote = false;
-                var index = 0;
-                for (var i = 0; i < text.Length; i++)
-                {
-                    var token = text[i];
-
-                    switch (token)
-                    {
-                        case ' ' when !inQuote:
-                            AddResult(text[index..i]);
-                            index = i + 1;
-                            break;
-                        case '"' when inQuote:
-                            inQuote = false;
-                            break;
-                        case '"' when !inQuote:
-                            inQuote = true;
-                            break;
-                    }
-                }
-
-                AddResult(text[index..]);
-
-                return result;
-
-                void AddResult(string res)
-                    => result.Add(res.Trim('"'));
-            }
         }
     }
 }
