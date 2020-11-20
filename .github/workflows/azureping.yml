@@ -15,4 +15,4 @@ jobs:
         with:
           url: 'https://webpreferslackbot.azurewebsites.net/meme/happylemon?top=test'
           method: 'GET'
-          timeout: 60000 
+          timeout: 120000
