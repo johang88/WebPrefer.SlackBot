@@ -17,7 +17,7 @@ namespace WebPrefer.SlackBot.Commands
         public MemeCommandHandler(ILogger<MemeCommandHandler> logger)
             => _logger = logger;
 
-        public async Task<SlashCommandResponse> Handle(SlashCommand command)
+        public Task<SlashCommandResponse> Handle(SlashCommand command)
         {
             _logger.LogInformation($"Processing command: {command.Command} {command.Text} from: {command.UserName}");
 
@@ -25,21 +25,21 @@ namespace WebPrefer.SlackBot.Commands
 
             if (!commands.Any())
             {
-                return new SlashCommandResponse
+                return Task.FromResult(new SlashCommandResponse
                 {
                     ResponseType = ResponseType.Ephemeral,
                     Message = new Message
                     {
                         Text = @"Usage /meme <type> <top text> <bottom text>"
                     }
-                };
+                });
             }
 
             var meme = commands[0];
             var top = commands.Count >= 2 ? commands[1] : "";
             var bottom = commands.Count >= 3 ? commands[2] : "";
 
-            return new SlashCommandResponse
+            return Task.FromResult(new SlashCommandResponse
             {
                 ResponseType = ResponseType.InChannel,
 
@@ -55,7 +55,7 @@ namespace WebPrefer.SlackBot.Commands
                         }
                     },
                 }
-            };
+            });
         }
     }
 }
