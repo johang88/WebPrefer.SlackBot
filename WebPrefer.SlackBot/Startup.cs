@@ -14,10 +14,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using WebPrefer.SlackBot.Commands;
 using WebPrefer.SlackBot.Helpers;
 using WebPrefer.SlackBot.Middleware;
+using WebPrefer.SlackBot.RequestHandlers;
 
 namespace WebPrefer.SlackBot
 {
@@ -37,6 +39,11 @@ namespace WebPrefer.SlackBot
 
             services.AddSingleton<MemeDatabase>();
             services.AddSingleton<FontManager>();
+
+            foreach (var (type, routeAttribute) in FindRequestHandlers())
+            {
+                services.AddTransient(type);
+            }
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -55,37 +62,26 @@ namespace WebPrefer.SlackBot
 
             app.UseRouting();
 
-            var fontManager = app.ApplicationServices.GetService<FontManager>();
-            var memes = app.ApplicationServices.GetService<MemeDatabase>();
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/meme/{image}", async context =>
+                // Wait, why are we not just using like a regular controller ?? don't know :D
+                // and this is more fun, everyone loves custom solutions
+                foreach (var (type, routeAttribute) in FindRequestHandlers())
                 {
-                    var imageName = (string)context.Request.RouteValues["image"] + ".jpg";
-                    if (!memes.TryGetPath(imageName, out var imagePath))
+                    var capturedType = type;
+                    endpoints.MapMethods(routeAttribute.Route, new string[] { routeAttribute.Method }, async context =>
                     {
-                        context.Response.StatusCode = 400;
-                        await context.Response.WriteAsync("invalid image");
-                        return;
-                    }
-
-                    using var stream = File.OpenRead(imagePath);
-                    using var image = await Image.LoadAsync(stream);
-
-                    var topText = context.Request.Query["top"];
-                    var bottomText = context.Request.Query["bottom"];
-
-                    if (context.Request.Query.ContainsKey("text"))
-                        bottomText = context.Request.Query["text"];
-
-                    image.DrawText(fontManager.DefaultFont, topText, false);
-                    image.DrawText(fontManager.DefaultFont, bottomText, true);
-
-                    context.Response.ContentType = "image/jpg";
-                    await image.SaveAsync(context.Response.Body, new JpegEncoder());
-                });
+                        var handler = (IRequestHandler)app.ApplicationServices.GetRequiredService(capturedType);
+                        await handler.Handle(context);
+                    });
+                }
             });
         }
+
+        private static IEnumerable<(Type, RouteAttribute)> FindRequestHandlers()
+            => Assembly.GetExecutingAssembly().GetTypes()
+                .Where(typeof(IRequestHandler).IsAssignableFrom)
+                .Where(x => x.GetCustomAttribute<RouteAttribute>() != null)
+                .Select(x => (x, x.GetCustomAttribute<RouteAttribute>()));
     }
 }
